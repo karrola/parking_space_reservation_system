@@ -15,7 +15,7 @@ def sign_up_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)  
-            return redirect("home")
+            return redirect("reservation")
     else:
         form = UserForm()
     return render(request, "users/sign_up.html", {"form": form})
@@ -27,7 +27,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect("home") 
+            return redirect("reservation") 
     else:
         form = EmailAuthenticationForm()
     return render(request, "users/login.html", {"form": form})
@@ -35,4 +35,4 @@ def login_view(request):
 @login_required
 def logout_view(request):
     logout(request)
-    return redirect("home")
+    return redirect("reservation")
