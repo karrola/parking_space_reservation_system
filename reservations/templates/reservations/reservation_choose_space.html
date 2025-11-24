@@ -4,11 +4,39 @@
 
 {% block content %}
 
-<form method="post">
+<h1 class="text-center mt-5 h5">Rezerwacja miejsca parkingowego - wybór miejsca</h1>
+
+<form method="post" class="mx-auto mt-4" style="max-width: 400px;">
     {% csrf_token %}
-    {{ form.as_p }}
     <input type="hidden" name="step" value="choose_space">
-    <button type="submit">Zarezerwuj miejsce</button>
+    <div class="text-muted">
+    <p class="my-2">Wybrana data rozpoczęcia: {{ form.date_start.value }}</p>
+    <p class="my-2">Wybrana data zakończenia: {{ form.date_end.value }}</p>
+    <p class="my-2">Wybrana godzina rozpoczęcia: {{ form.time_start.value }}</p>
+    <p class="my-2">Wybrana godzina zakończenia: {{ form.time_end.value }}</p>
+    </div>
+
+    {% for error in form.non_field_errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+    {% endfor %}
+
+    <div class="my-3">
+        <label class="form-label mb-1">{{ form.parking_space.label_tag }}</label>
+        {{ form.parking_space }}
+        {% for error in form.parking_space.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="my-3">
+        <label class="form-label mb-1">{{ form.number_plate.label_tag }}</label>
+        {{ form.number_plate }}
+        {% for error in form.number_plate.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100 mb-4">Zarezerwuj miejsce</button>
 </form>
 
 {% endblock %}

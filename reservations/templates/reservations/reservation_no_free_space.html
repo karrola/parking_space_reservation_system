@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Strona główna{% endblock %}
+
+{% block content %}
+
+<h1 class="text-center mt-5 h5">Brak wolnych miejsc parkingowych.</h1>
+<p class="text-center mt-4 mx-auto" style="max-width: 800px;">
+    Niestety, w wybranym terminie nie ma dostępnych miejsc parkingowych. Spróbuj zmienić zakres dat lub godzin rezerwacji. <br>
+    Powrót na <a href="{% url 'reservation' %}">stronę główną</a>.
+</p>
+
+{% endblock %}

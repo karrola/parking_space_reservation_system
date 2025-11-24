@@ -68,11 +68,11 @@ class ReservationChooseDateForm(BootstrapModelForm, ModelForm):
 
         # odwrotny zakres dat
         if date_start > date_end:
-            self.add_error('date_end', "Data zakończenia nie może być wcześniej niż data rozpoczęcia.")
+            self.add_error('date_end', "Data zakończenia musi być późniejsza niż data rozpoczęcia.")
 
         # odwrotny zakres godzin/zakres godzin przechodzi przez północ
         if time_end <= time_start:
-            self.add_error('time_end', "Godzina zakończenia nie może być wcześniej niż godzina początku. Jeśli chcesz dokonać rezerwacji, która przechodzi przez 00:00, musisz podzielić ją na dwie rezerwacje.")
+            self.add_error('time_end', "Godzina zakończenia musi być późniejsza niż godzina początku. Jeśli chcesz dokonać rezerwacji, która przechodzi przez 00:00, musisz podzielić ją na dwie rezerwacje.")
 
         return cleaned_data
 
@@ -81,11 +81,15 @@ class ReservationChooseSpaceForm(BootstrapModelForm, ModelForm):
     class Meta:
         model = Reservation
         fields = ["date_start", "date_end", "time_start", "time_end", "parking_space", "number_plate"]
+        labels = {
+            "parking_space": "Miejsce parkingowe",
+            "number_plate": "Numer rejestracyjny samochodu",
+        }
         widgets = {
-            "date_start": forms.HiddenInput(),
-            "date_end": forms.HiddenInput(),
-            "time_start": forms.HiddenInput(),
-            "time_end": forms.HiddenInput(),
+            "date_start": forms.TextInput(attrs={'readonly': 'readonly'}),
+            "date_end": forms.TextInput(attrs={'readonly': 'readonly'}),
+            "time_start": forms.TextInput(attrs={'readonly': 'readonly'}),
+            "time_end": forms.TextInput(attrs={'readonly': 'readonly'}),
         }
 
     # dodatkowy argument pozwalający na przekazanie listy dotępnych miejsc do wyboru w formularzu    

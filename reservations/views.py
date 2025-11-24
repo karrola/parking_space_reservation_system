@@ -25,6 +25,12 @@ def reservation_view(request):
 
             available_spaces = ParkingSpace.objects.exclude(id__in=conflicts)
 
+            # jeśli nie ma wolnych miejsc to nie pokazuj drugiego formularza:
+            if not available_spaces:
+                # flaga żeby zablokować wchodzenie na stronę braku miejsc przez wpisanie url
+                request.session['no_free_space'] = True
+                return redirect("reservation_no_free_space")
+
             # przekazujemy dostępne miejsca i wybraną datę rezerwacji do drugiego formularza
             space_form = ReservationChooseSpaceForm(
                 available_spaces=available_spaces,
@@ -57,7 +63,7 @@ def reservation_view(request):
                 number_plate=space_form.cleaned_data['number_plate'],
             )
 
-            # flaga żeby zablokować wchodzenie na stronę sukcesu "z palca"
+            # flaga żeby zablokować wchodzenie na stronę sukcesu przez wpisanie url
             request.session['reservation_done'] = True
             return redirect("reservation_success")
         else:
@@ -78,6 +84,15 @@ def reservation_success_view(request):
     del request.session['reservation_done']
     return render(request, "reservations/reservation_success.html")
 
+@login_required
+def reservation_no_free_space_view(request):
+    # sprawdzamy czy jest flaga
+    if not request.session.get('no_free_space'):
+        return redirect("reservation")
+    
+    # renderujemy i usuwamy flagę
+    del request.session['no_free_space']
+    return render(request, "reservations/reservation_no_free_space.html")
 
 @login_required
 def my_reservations_view(request):
