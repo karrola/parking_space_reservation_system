@@ -22,7 +22,13 @@
                             <p class="card-text mb-1"><strong>Godzina zakończenia w każdym dniu:</strong> {{ reservation.time_end }}</p>
                             <p class="card-text mb-1"><strong>Numer rejestracyjny:</strong> {{ reservation.number_plate }}</p>
                             <a href="#" class="btn btn-outline-primary btn-sm mt-2">Edytuj rezerwację</a>
-                            <a href="#" class="btn btn-outline-danger btn-sm mt-2">Anuluj rezerwację</a>
+                            <form method="POST" action="{% url 'reservation_cancel' %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="reservation_id" value="{{ reservation.id }}">
+                                <button type="submit" class="btn btn-outline-danger btn-sm mt-2">
+                                    Anuluj rezerwację
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

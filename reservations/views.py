@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 from .forms import ReservationChooseDateForm, ReservationChooseSpaceForm
 from .models import Reservation, ParkingSpace
 from django.utils import timezone
 from datetime import datetime
 
 @login_required
+@never_cache
 def reservation_view(request):
     # krok 1 - wybór daty i godziny rezerwacji
     if request.method == "POST" and request.POST.get("step") == "choose_date":
@@ -18,6 +20,7 @@ def reservation_view(request):
 
             # wybieramy miejsca które kolidują i wykluczamy je
             conflicts = Reservation.objects.filter(
+                cancelled=False,
                 date_start__lte=date_end,
                 date_end__gte=date_start,
                 time_start__lt=time_end,
@@ -54,6 +57,27 @@ def reservation_view(request):
     elif request.method == "POST" and request.POST.get("step") == "choose_space":
         space_form = ReservationChooseSpaceForm(request.POST)
         if space_form.is_valid():
+
+            # ponowna walidacja w celu zabezpieczenia dodania drugi raz tego samego miejsca po cofnięciu formularza
+            date_start = space_form.cleaned_data['date_start']
+            date_end = space_form.cleaned_data['date_end']
+            time_start = space_form.cleaned_data['time_start']
+            time_end = space_form.cleaned_data['time_end']
+            parking_space = space_form.cleaned_data['parking_space']
+
+            conflicts = Reservation.objects.filter(
+                cancelled=False,
+                parking_space=parking_space,
+                date_start__lte=date_end,
+                date_end__gte=date_start,
+                time_start__lt=time_end,
+                time_end__gt=time_start
+            ).exists()
+
+            if conflicts:
+                space_form.add_error(None, "To miejsce zostało już zarezerwowane.")
+                return render(request, "reservations/reservation_choose_space.html", {"form": space_form})
+            
             Reservation.objects.create(
                 parking_space=space_form.cleaned_data['parking_space'],
                 user=request.user,
@@ -96,6 +120,7 @@ def reservation_no_free_space_view(request):
     return render(request, "reservations/reservation_no_free_space.html")
 
 @login_required
+@never_cache
 def my_reservations_view(request):
     user = request.user
     now = timezone.localtime()
@@ -137,3 +162,30 @@ def my_reservations_view(request):
 
     return render(request, "reservations/my_reservations.html", context)
 
+@login_required
+def reservation_cancel_view(request):
+    if request.method != "POST":
+        return redirect("reservation")
+    
+    reservation_id = request.POST.get("reservation_id")
+    reservation = get_object_or_404(
+        Reservation,
+        id=reservation_id,
+        user=request.user
+    )
+
+    reservation.cancelled = True
+    reservation.save()
+
+    request.session['reservation_cancelled'] = True
+    return redirect("reservation_cancelled")
+
+@login_required
+def reservation_cancelled_view(request):
+    # sprawdzamy czy jest flaga
+    if not request.session.get('reservation_cancelled'):
+        return redirect("reservation")
+    
+    # renderujemy i usuwamy flagę
+    del request.session['reservation_cancelled']
+    return render(request, "reservations/reservation_cancelled.html")

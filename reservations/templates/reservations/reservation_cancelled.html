@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Rezerwacja anulowana{% endblock %}
+
+{% block content %}
+
+<h1 class="text-center mt-5 h5">Twoja rezerwacja została anulowana!</h1>
+<p class="text-center mt-4 mx-auto" style="max-width: 800px;">
+    Aby dokonać nowej rezerwacji, przejdź na <a href="{% url 'reservation' %}">Stronę główną</a>. Aby zobaczyć szczegóły swoich rezerwacji, przejdź na stronę <a href="{% url 'my_reservations' %}">Moje rezerwacje</a>.
+</p>
+
+{% endblock %}
