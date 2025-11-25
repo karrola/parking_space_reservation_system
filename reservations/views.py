@@ -122,5 +122,18 @@ def my_reservations_view(request):
         else:
             active.append(reservation)
 
-    return render(request, "reservations/my_reservations.html", {"cancelled": cancelled, "active": active, "finished": finished, "upcoming": upcoming})
+    context = {
+        "active": active,
+        "upcoming": upcoming,
+        "finished": finished,
+        "cancelled": cancelled,
+        "categories": [
+            ("Aktywne rezerwacje", active),
+            ("Nadchodzące rezerwacje", upcoming),
+            ("Zakończone rezerwacje", finished),
+            ("Anulowane rezerwacje", cancelled),
+        ],
+    }
+
+    return render(request, "reservations/my_reservations.html", context)
 

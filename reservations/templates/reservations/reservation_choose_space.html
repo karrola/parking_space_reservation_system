@@ -9,6 +9,12 @@
 <form method="post" class="mx-auto mt-4" style="max-width: 400px;">
     {% csrf_token %}
     <input type="hidden" name="step" value="choose_space">
+
+    <!--- renderujemy hidden inputy żeby forms miał dane z poprzedniego formsa -->
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+
     <div class="text-muted">
     <p class="my-2">Wybrana data rozpoczęcia: {{ form.date_start.value }}</p>
     <p class="my-2">Wybrana data zakończenia: {{ form.date_end.value }}</p>

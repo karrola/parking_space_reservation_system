@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 def auth_view(request):
+    if request.user.is_authenticated:
+        return redirect("reservation")
     return render(request, "users/auth.html")
 
 def sign_up_view(request):

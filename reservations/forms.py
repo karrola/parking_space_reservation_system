@@ -86,10 +86,10 @@ class ReservationChooseSpaceForm(BootstrapModelForm, ModelForm):
             "number_plate": "Numer rejestracyjny samochodu",
         }
         widgets = {
-            "date_start": forms.TextInput(attrs={'readonly': 'readonly'}),
-            "date_end": forms.TextInput(attrs={'readonly': 'readonly'}),
-            "time_start": forms.TextInput(attrs={'readonly': 'readonly'}),
-            "time_end": forms.TextInput(attrs={'readonly': 'readonly'}),
+            "date_start": forms.HiddenInput(),
+            "date_end": forms.HiddenInput(),
+            "time_start": forms.HiddenInput(),
+            "time_end": forms.HiddenInput(),
         }
 
     # dodatkowy argument pozwalający na przekazanie listy dotępnych miejsc do wyboru w formularzu    
