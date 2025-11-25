@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from .forms import ReservationChooseDateForm, ReservationChooseSpaceForm
 from .models import Reservation, ParkingSpace
+from django.utils import timezone
+from datetime import datetime
 
 @login_required
 def reservation_view(request):
@@ -96,5 +97,30 @@ def reservation_no_free_space_view(request):
 
 @login_required
 def my_reservations_view(request):
-    return render(request, "reservations/my_reservations.html")
+    user = request.user
+    now = timezone.localtime()
+
+    cancelled = user.reservations.filter(cancelled=True)
+
+    active = []
+    finished = []
+    upcoming = []
+
+    for reservation in user.reservations.filter(cancelled=False):
+        end_datetime = timezone.make_aware(
+            datetime.combine(reservation.date_end, reservation.time_end)
+        )
+
+        start_datetime = timezone.make_aware(
+            datetime.combine(reservation.date_start, reservation.time_start)
+        )
+
+        if end_datetime < now:
+            finished.append(reservation)
+        elif start_datetime > now:
+            upcoming.append(reservation)
+        else:
+            active.append(reservation)
+
+    return render(request, "reservations/my_reservations.html", {"cancelled": cancelled, "active": active, "finished": finished, "upcoming": upcoming})
 
