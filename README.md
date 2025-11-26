@@ -38,13 +38,13 @@ Python, Django, SQLite, HTML5 + DjangoTemplates, Bootstrap 5
    python3 manage.py runserver  # Linux / macOS
    ```
 
-   Aplikacja będzie dostępna pod adresem http://127.0.0.1:8000/
-   Panel administracyjny jest dostępny pod adresem http://127.0.0.1:8000/admin/
+   Aplikacja będzie dostępna pod adresem http://127.0.0.1:8000/.  
+   Panel administracyjny jest dostępny pod adresem http://127.0.0.1:8000/admin/.  
    Po zalogowaniu na konto superusera można w nim łatwo dodać przykładowe miejsca parkingowe, w celu umożliwienia przetestowania działania aplikacji.
 
 ## Uwagi dot. bezpieczeństwa
 
-Projekt został stworzony do celów rektuacji - SECRET_KEY jest jawny i służy tylko do uruchamiania lokalnie.
+Projekt został stworzony do celów rektuacji - SECRET_KEY jest jawny i służy tylko do uruchamiania lokalnie.  
 W środowisku produkcyjnym klucz powinien być przechowywany w zmiennych środowiskowych.
 
 ## Wykorzystanie AI
