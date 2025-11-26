@@ -8,7 +8,7 @@
     <h1 class="text-center mb-5 h4">Moje rezerwacje</h1>
 
     {% for category, reservations in categories %}
-        <h2 class="mb-3 h5">{{ category }}</h2>
+        <h2 class="mb-3 h5 text-primary">{{ category }}</h2>
 
         <div class="row row-cols-1 row-cols-md-2 g-3 mb-5">
             {% for reservation in reservations %}
@@ -21,7 +21,23 @@
                             <p class="card-text mb-1"><strong>Godzina rozpoczęcia w każdym dniu:</strong> {{ reservation.time_start }}</p>
                             <p class="card-text mb-1"><strong>Godzina zakończenia w każdym dniu:</strong> {{ reservation.time_end }}</p>
                             <p class="card-text mb-1"><strong>Numer rejestracyjny:</strong> {{ reservation.number_plate }}</p>
-                            <a href="#" class="btn btn-outline-primary btn-sm mt-2">Edytuj rezerwację</a>
+                            
+                            {% if category == "Nadchodzące rezerwacje" %}
+                            <form method="POST" action="{% url 'reservation_edit' %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="step" value="start_edit">
+                                <input type="hidden" name="reservation_id" value="{{ reservation.id }}">
+                                <input type="hidden" name="date_start" value="{{ reservation.date_start }}">
+                                <input type="hidden" name="date_end" value="{{ reservation.date_end }}">
+                                <input type="hidden" name="time_start" value="{{ reservation.time_start }}">
+                                <input type="hidden" name="time_end" value="{{ reservation.time_end }}">
+                                <input type="hidden" name="number_plate" value="{{ reservation.number_plate }}">
+                                <button type="submit" class="btn btn-outline-primary btn-sm mt-2">
+                                    Edytuj rezerwację
+                                </button>
+                            </form>
+                            {% endif %}
+                            {% if category == "Aktywne rezerwacje" or category == "Nadchodzące rezerwacje" %}
                             <form method="POST" action="{% url 'reservation_cancel' %}" style="display: inline;">
                                 {% csrf_token %}
                                 <input type="hidden" name="reservation_id" value="{{ reservation.id }}">
@@ -29,6 +45,7 @@
                                     Anuluj rezerwację
                                 </button>
                             </form>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

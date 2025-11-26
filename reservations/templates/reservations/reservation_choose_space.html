@@ -1,14 +1,30 @@
 {% extends "base.html" %}
 
-{% block title %}Strona główna{% endblock %}
+{% block title %}
+    {% if is_edit %} Edycja - wybór miejsca
+    {% else %} Rezerwacja - wybór miejsca
+    {% endif %}
+{% endblock %}
 
 {% block content %}
 
-<h1 class="text-center mt-5 h5">Rezerwacja miejsca parkingowego - wybór miejsca</h1>
+<h1 class="text-center mt-5 h5">
+    {% if is_edit %} Edycja rezerwacji miejsca parkingowego - wybór miejsca
+    {% else %} Rezerwacja miejsca parkingowego - wybór miejsca
+    {% endif %}
+</h1>
 
 <form method="post" class="mx-auto mt-4" style="max-width: 400px;">
     {% csrf_token %}
     <input type="hidden" name="step" value="choose_space">
+
+    {% if reservation_id %}
+        <input type="hidden" name="reservation_id" value="{{ reservation_id }}">
+    {% endif %}
+
+    {% if number_plate %}
+        <input type="hidden" name="number_plate" value="{{ number_plate }}">
+    {% endif %}
 
     <!--- renderujemy hidden inputy żeby forms miał dane z poprzedniego formsa -->
     {% for hidden in form.hidden_fields %}

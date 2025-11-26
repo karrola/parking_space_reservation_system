@@ -59,10 +59,6 @@ class ReservationChooseDateForm(BootstrapModelForm, ModelForm):
             self.add_error('date_end', "Nie można zarezerwować terminu w przeszłości.")
 
         # ten sam dzień, godzina w przeszłości
-        if date_start == today and time_start < time_now:
-            self.add_error('time_start', "Nie można zarezerwować terminu w przeszłości.")
-
-        # ten sam dzień, godzina w przeszłości
         if date_start == today and time_end < time_now:
             self.add_error('time_end', "Nie można zarezerwować terminu w przeszłości.")
 

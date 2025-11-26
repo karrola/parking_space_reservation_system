@@ -13,10 +13,10 @@ def reservation_view(request):
     if request.method == "POST" and request.POST.get("step") == "choose_date":
         date_form = ReservationChooseDateForm(request.POST)
         if date_form.is_valid():
-            date_start = date_form.cleaned_data['date_start']
-            date_end = date_form.cleaned_data['date_end']
-            time_start = date_form.cleaned_data['time_start']
-            time_end = date_form.cleaned_data['time_end']
+            date_start = date_form.cleaned_data["date_start"]
+            date_end = date_form.cleaned_data["date_end"]
+            time_start = date_form.cleaned_data["time_start"]
+            time_end = date_form.cleaned_data["time_end"]
 
             # wybieramy miejsca które kolidują i wykluczamy je
             conflicts = Reservation.objects.filter(
@@ -25,24 +25,24 @@ def reservation_view(request):
                 date_end__gte=date_start,
                 time_start__lt=time_end,
                 time_end__gt=time_start
-            ).values_list('parking_space_id', flat=True)
+            ).values_list("parking_space_id", flat=True)
 
             available_spaces = ParkingSpace.objects.exclude(id__in=conflicts)
 
             # jeśli nie ma wolnych miejsc to nie pokazuj drugiego formularza:
             if not available_spaces:
                 # flaga żeby zablokować wchodzenie na stronę braku miejsc przez wpisanie url
-                request.session['no_free_space'] = True
+                request.session["no_free_space"] = True
                 return redirect("reservation_no_free_space")
 
             # przekazujemy dostępne miejsca i wybraną datę rezerwacji do drugiego formularza
             space_form = ReservationChooseSpaceForm(
                 available_spaces=available_spaces,
                 initial={
-                    'date_start': date_start,
-                    'date_end': date_end,
-                    'time_start': time_start,
-                    'time_end': time_end,
+                    "date_start": date_start,
+                    "date_end": date_end,
+                    "time_start": time_start,
+                    "time_end": time_end,
                 }
             )
 
@@ -59,11 +59,11 @@ def reservation_view(request):
         if space_form.is_valid():
 
             # ponowna walidacja w celu zabezpieczenia dodania drugi raz tego samego miejsca po cofnięciu formularza
-            date_start = space_form.cleaned_data['date_start']
-            date_end = space_form.cleaned_data['date_end']
-            time_start = space_form.cleaned_data['time_start']
-            time_end = space_form.cleaned_data['time_end']
-            parking_space = space_form.cleaned_data['parking_space']
+            date_start = space_form.cleaned_data["date_start"]
+            date_end = space_form.cleaned_data["date_end"]
+            time_start = space_form.cleaned_data["time_start"]
+            time_end = space_form.cleaned_data["time_end"]
+            parking_space = space_form.cleaned_data["parking_space"]
 
             conflicts = Reservation.objects.filter(
                 cancelled=False,
@@ -79,17 +79,17 @@ def reservation_view(request):
                 return render(request, "reservations/reservation_choose_space.html", {"form": space_form})
             
             Reservation.objects.create(
-                parking_space=space_form.cleaned_data['parking_space'],
+                parking_space=space_form.cleaned_data["parking_space"],
                 user=request.user,
-                date_start=space_form.cleaned_data['date_start'],
-                date_end=space_form.cleaned_data['date_end'],
-                time_start=space_form.cleaned_data['time_start'],
-                time_end=space_form.cleaned_data['time_end'],
-                number_plate=space_form.cleaned_data['number_plate'],
+                date_start=space_form.cleaned_data["date_start"],
+                date_end=space_form.cleaned_data["date_end"],
+                time_start=space_form.cleaned_data["time_start"],
+                time_end=space_form.cleaned_data["time_end"],
+                number_plate=space_form.cleaned_data["number_plate"],
             )
 
             # flaga żeby zablokować wchodzenie na stronę sukcesu przez wpisanie url
-            request.session['reservation_done'] = True
+            request.session["reservation_done"] = True
             return redirect("reservation_success")
         else:
             return render(request, "reservations/reservation_choose_space.html", {"form": space_form})
@@ -102,21 +102,21 @@ def reservation_view(request):
 @login_required
 def reservation_success_view(request):
     # sprawdzamy czy jest flaga
-    if not request.session.get('reservation_done'):
+    if not request.session.get("reservation_done"):
         return redirect("reservation")
     
     # renderujemy i usuwamy flagę
-    del request.session['reservation_done']
+    del request.session["reservation_done"]
     return render(request, "reservations/reservation_success.html")
 
 @login_required
 def reservation_no_free_space_view(request):
     # sprawdzamy czy jest flaga
-    if not request.session.get('no_free_space'):
+    if not request.session.get("no_free_space"):
         return redirect("reservation")
     
     # renderujemy i usuwamy flagę
-    del request.session['no_free_space']
+    del request.session["no_free_space"]
     return render(request, "reservations/reservation_no_free_space.html")
 
 @login_required
@@ -177,15 +177,141 @@ def reservation_cancel_view(request):
     reservation.cancelled = True
     reservation.save()
 
-    request.session['reservation_cancelled'] = True
+    request.session["reservation_cancelled"] = True
     return redirect("reservation_cancelled")
 
 @login_required
 def reservation_cancelled_view(request):
     # sprawdzamy czy jest flaga
-    if not request.session.get('reservation_cancelled'):
+    if not request.session.get("reservation_cancelled"):
         return redirect("reservation")
     
     # renderujemy i usuwamy flagę
-    del request.session['reservation_cancelled']
+    del request.session["reservation_cancelled"]
     return render(request, "reservations/reservation_cancelled.html")
+
+@login_required
+@never_cache
+def reservation_edit_view(request):
+    # KROK 1 – wybór daty
+    if request.method == "POST" and request.POST.get("step") == "start_edit":
+        # id rezerwacji
+        reservation_id = request.POST.get("reservation_id")
+        reservation = Reservation.objects.get(id=reservation_id, user=request.user)
+
+        number_plate = request.POST.get("number_plate")
+
+        # formatowanie dat
+        date_start = reservation.date_start.isoformat()
+        date_end = reservation.date_end.isoformat()
+
+        # prepopulacja pól formularza
+        date_form = ReservationChooseDateForm(
+            initial={
+                    "date_start": date_start,
+                    "date_end": date_end,
+                    "time_start": reservation.time_start,
+                    "time_end": reservation.time_end,
+                })
+        
+        return render(request, "reservations/reservation_choose_date.html", {
+                "form": date_form,
+                "reservation_id": reservation_id,
+                "number_plate": number_plate,
+                "is_edit": True
+            })
+    
+    elif request.method == "POST" and request.POST.get("step") == "choose_date":
+
+        reservation_id = request.POST.get("reservation_id")
+
+        number_plate = request.POST.get("number_plate")
+        
+        date_form = ReservationChooseDateForm(request.POST)
+        
+        if date_form.is_valid():
+            date_start = date_form.cleaned_data["date_start"]
+            date_end = date_form.cleaned_data["date_end"]
+            time_start = date_form.cleaned_data["time_start"]
+            time_end = date_form.cleaned_data["time_end"]
+
+            conflicts = Reservation.objects.filter(
+                cancelled=False,
+                date_start__lte=date_end,
+                date_end__gte=date_start,
+                time_start__lt=time_end,
+                time_end__gt=time_start
+            ).exclude(id=reservation_id).values_list("parking_space_id", flat=True)
+
+            available_spaces = ParkingSpace.objects.exclude(id__in=conflicts)
+            if not available_spaces:
+                request.session["no_free_space"] = True
+                return redirect("reservation_no_free_space")
+            
+            space_form = ReservationChooseSpaceForm(
+                available_spaces=available_spaces,
+                initial={
+                    "date_start": date_start,
+                    "date_end": date_end,
+                    "time_start": time_start,
+                    "time_end": time_end,
+                    "number_plate": number_plate
+                }
+            )
+            return render(request, "reservations/reservation_choose_space.html", {
+                "form": space_form,
+                "available_spaces": available_spaces,
+                "reservation_id": reservation_id,
+                "is_edit": True
+            })
+
+        return render(request, "reservations/reservation_choose_date.html", {"form": date_form, "reservation_id": reservation_id, "number_plate": number_plate, "is_edit": True})
+
+    # KROK 2 – wybór miejsca
+    elif request.method == "POST" and request.POST.get("step") == "choose_space":
+        
+        reservation_id = request.POST.get("reservation_id")
+        print(reservation_id)
+
+        space_form = ReservationChooseSpaceForm(request.POST)
+
+        if space_form.is_valid():
+            date_start = space_form.cleaned_data["date_start"]
+            date_end = space_form.cleaned_data["date_end"]
+            time_start = space_form.cleaned_data["time_start"]
+            time_end = space_form.cleaned_data["time_end"]
+            parking_space = space_form.cleaned_data["parking_space"]
+            number_plate = space_form.cleaned_data["number_plate"]
+
+            conflicts = Reservation.objects.filter(
+                cancelled=False,
+                parking_space=parking_space,
+                date_start__lte=date_end,
+                date_end__gte=date_start,
+                time_start__lt=time_end,
+                time_end__gt=time_start
+            ).exclude(id=reservation_id).exists()
+
+            if conflicts:
+                space_form.add_error(None, "To miejsce zostało już zarezerwowane.")
+                return render(request, "reservations/reservation_choose_space.html", {"form": space_form, "is_edit": True})
+
+            # aktualizacja rezerwacji
+            reservation = Reservation.objects.get(id=reservation_id, user=request.user)
+
+            reservation.parking_space = parking_space
+            reservation.date_start = date_start
+            reservation.date_end = date_end
+            reservation.time_start = time_start
+            reservation.time_end = time_end
+            reservation.number_plate = number_plate
+
+            reservation.save()
+
+            request.session["reservation_done"] = True
+            return redirect("reservation_success")
+        else:
+            return render(request, "reservations/reservation_choose_space.html", {"form": space_form, "reservation_id": reservation_id, "number_plate": number_plate, "is_edit": True})
+
+    else:
+        return redirect("reservation")
