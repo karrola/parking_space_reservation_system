@@ -1,52 +1,52 @@
-# Drzewo Czerwono-Czarne - system rezerwacji miejsc parkingowych
+# Red-Black Tree – Parking Space Reservation System
 
-Projekt stworzony w ramach zadania rekrutacyjnego do sekcji webowej koła naukowego BIT na AGH.
+This project was created as part of the recruitment task for the web section of the BIT Student Research Group at AGH.
 
-## Technologie
+## Technologies
 
-Python, Django, SQLite, HTML5 + DjangoTemplates, Bootstrap 5
+Python, Django, SQLite, HTML5 + Django Templates, Bootstrap 5
 
-## Funkcjonalności
+## Features
 
-- rezerwowanie miejsc parkingowych
-- przegląd rezerwacji użytkownika
-- edycja i anulowanie istniejących rezerwacji
-- panel administracyjny django-admin
+- Booking parking spaces
+- Viewing a user’s reservations
+- Editing and canceling existing reservations
+- admin panel supported by django-admin
 
-## Instrukcja uruchomienia
+## Setup Instructions
 
-1. Sklonuj repozytorium
-2. (zalecane) Stwórz wirtualne środowisko
-3. Zainstaluj zależności
-   ```
-   pip install -r requirements.txt
-   ```
-4. Wykonaj migracje bazy danych
-   ```
-   py manage.py migrate       # Windows
-   python3 manage.py migrate  # Linux / macOS
-   ```
-5. W celu korzystania z panelu admina django-admin stwórz superusera:
-   ```
-   py manage.py createsuperuser       # Windows
-   python3 manage.py createsuperuser  # Linux / macOS
-   ```
-6. Uruchom serwer deweloperski
+1. Clone the repository
+2. (Recommended) Create a virtual environment
+3. Install dependencies:
+```
+pip install -r requirements.txt
+```
+4. Apply database migrations:
+```
+py manage.py migrate # Windows
+python3 manage.py migrate # Linux / macOS
+```
+5. To use the Django admin panel, create a superuser:
+```
+py manage.py createsuperuser # Windows
+python3 manage.py createsuperuser # Linux / macOS
+```
+6. Run the development server:
+```
+py manage.py runserver # Windows
+python3 manage.py runserver # Linux / macOS
+```
 
-   ```
-   py manage.py runserver       # Windows
-   python3 manage.py runserver  # Linux / macOS
-   ```
+The application will be available at: http://127.0.0.1:8000/  
+The admin panel is available at: http://127.0.0.1:8000/admin/  
 
-   Aplikacja będzie dostępna pod adresem http://127.0.0.1:8000/.  
-   Panel administracyjny jest dostępny pod adresem http://127.0.0.1:8000/admin/.  
-   Po zalogowaniu na konto superusera można w nim łatwo dodać przykładowe miejsca parkingowe, w celu umożliwienia przetestowania działania aplikacji.
+After logging in as a superuser, you can easily add sample parking spaces in the admin panel to test the application.
 
-## Uwagi dot. bezpieczeństwa
+## Security Notes
 
-Projekt został stworzony do celów rektuacji - SECRET_KEY jest jawny i służy tylko do uruchamiania lokalnie.  
-W środowisku produkcyjnym klucz powinien być przechowywany w zmiennych środowiskowych.
+This project was created for recruitment purposes – the `SECRET_KEY` is public and intended only for local development.  
+In a production environment, the key should be stored in environment variables.
 
-## Wykorzystanie AI
+## AI Usage
 
-AI (ChatGPT) był używany jako wsparcie w debugowaniu kodu, pisaniu testów i tworzeniu elementów interfejsu (klasy Bootstrap).
+AI (ChatGPT) was used as support for debugging code, writing tests, and creating interface elements (Bootstrap classes).
