@@ -2,15 +2,17 @@
 
 This project was created as part of the recruitment task for the web section of the BIT Student Research Group at AGH.
 
+https://github.com/user-attachments/assets/9b1669ae-5694-4951-bf87-7ed61c86f989
+
 ## Technologies
 
 Python, Django, SQLite, HTML5 + Django Templates, Bootstrap 5
 
 ## Features
 
-- Booking parking spaces
-- Viewing a user’s reservations
-- Editing and canceling existing reservations
+- booking available parking spaces
+- viewing a user’s reservations
+- editing and canceling existing reservations
 - admin panel supported by django-admin
 
 ## Setup Instructions
